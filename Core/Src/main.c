@@ -23,7 +23,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "motor.h"
+#include "pid.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,6 +55,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+Motor_t motor;
+PID_CONTROL_t pid;
 
 /* USER CODE END 0 */
 
@@ -87,7 +90,17 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM4_Init();
   MX_TIM3_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_1);
+  HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_2);
+  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+
+
+
+  PIDInit(&pid, 5 ,2 , 1);
+
 
   /* USER CODE END 2 */
 
@@ -95,9 +108,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	 // MotorTuning(&pid, &motor, 200.);
+
   }
   /* USER CODE END 3 */
 }
@@ -142,6 +158,18 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+
+	  if(htim->Instance == htim3.Instance)
+	  {
+		  	//MotorSetDuty(50);
+		  ReadEncoder(&motor);
+		  MotorTuning(&pid, &motor, 80.);
+	  }
+}
+
 
 /* USER CODE END 4 */
 
