@@ -100,7 +100,7 @@ int main(void)
 
 
 
-  PIDInit(&pid, 1 ,0.7 , 0.00001);
+  PIDInit(&pid, 0.25 ,0.07 , 0.00001);
 
 
   /* USER CODE END 2 */
@@ -167,7 +167,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  {
 
 		  ReadEncoder(&motor);
-		  MotorTuningVelocity(&pid, &motor, 100.);
+		  MotorTuningVelocity(&pid, &motor, 300.);
 		 // MotorTuningPosition(&pid, &motor, 200);
 
 

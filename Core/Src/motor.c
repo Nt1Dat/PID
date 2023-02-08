@@ -39,10 +39,10 @@ void ReadEncoder(Motor_t * tmotor){
 //if((TIM4->CR1 & ) == )
 
 
-			if(tmotor->counter < 1000)
-			{
-				tmotor->counter = tmotor->counter;
-			}
+//			if(tmotor->counter < 1000)
+//			{
+//				tmotor->counter = tmotor->counter;
+//			}
 			tmotor->rounds=tmotor->counter/330/4;
 			uint16_t temp_data = (tmotor->counter - tmotor->o_counter);
 			tmotor->velocity = temp_data/330.0/4.0*100.0*60.0; // rpm
