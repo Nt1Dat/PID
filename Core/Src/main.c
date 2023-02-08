@@ -92,6 +92,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  //HAL_TIM_Encoder_Start_IT(htim, Channel)
   HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_2);
   HAL_TIM_Base_Start_IT(&htim3);
@@ -99,7 +100,7 @@ int main(void)
 
 
 
-  PIDInit(&pid, 5 ,2 , 1);
+  PIDInit(&pid, 1 ,0.7 , 0.00001);
 
 
   /* USER CODE END 2 */
@@ -112,7 +113,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	 // MotorTuning(&pid, &motor, 200.);
+
 
   }
   /* USER CODE END 3 */
@@ -164,9 +165,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  if(htim->Instance == htim3.Instance)
 	  {
-		  	//MotorSetDuty(50);
+
 		  ReadEncoder(&motor);
-		  MotorTuning(&pid, &motor, 80.);
+		  MotorTuningVelocity(&pid, &motor, 100.);
+		 // MotorTuningPosition(&pid, &motor, 200);
+
+
 	  }
 }
 
