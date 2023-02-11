@@ -19,12 +19,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "motor.h"
 #include "pid.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +59,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 Motor_t motor;
 PID_CONTROL_t pid;
+uint8_t buf[7];
 
 /* USER CODE END 0 */
 
@@ -91,6 +94,7 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM3_Init();
   MX_TIM2_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   //HAL_TIM_Encoder_Start_IT(htim, Channel)
   HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_1);
@@ -100,7 +104,7 @@ int main(void)
 
 
 
-  PIDInit(&pid, 0.25 ,0.07 , 0.00001);
+  PIDInit(&pid, 0.5,0.25, 0.0001 );
 
 
   /* USER CODE END 2 */
@@ -167,8 +171,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  {
 
 		  ReadEncoder(&motor);
-		  MotorTuningVelocity(&pid, &motor, 300.);
-		 // MotorTuningPosition(&pid, &motor, 200);
+		  MotorTuningVelocity(&pid, &motor, 80.);
+		  //sprintf(buf,"%d.%02u\n", (int) motor.velocity, (int) ((motor.velocity - (int) motor.velocity ) * 100) );
+		  //HAL_UART_Transmit(&huart1, buf, sizeof(buf),100);
+
 
 
 	  }

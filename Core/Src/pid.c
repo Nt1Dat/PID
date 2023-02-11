@@ -33,5 +33,7 @@ float PIDCompute(PID_CONTROL_t *PID_Ctrl, float SetPoint, float Input, float dTs
     dD = PID_Ctrl->dKd * (Error - PID_Ctrl->dErrorTerm) /dTs;
     dPIDResult = dP + dI + dD;
     PID_Ctrl->dErrorTerm = Error;
+    PID_Ctrl->result=dPIDResult;
     return dPIDResult;
+
 }

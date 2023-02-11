@@ -35,14 +35,7 @@ void MotorSetDuty(uint16_t nDuty)
 // sample 10ms
 void ReadEncoder(Motor_t * tmotor){
 			tmotor->counter=__HAL_TIM_GET_COUNTER(&htim4);
-//fix when overflow
-//if((TIM4->CR1 & ) == )
 
-
-//			if(tmotor->counter < 1000)
-//			{
-//				tmotor->counter = tmotor->counter;
-//			}
 			tmotor->rounds=tmotor->counter/330/4;
 			uint16_t temp_data = (tmotor->counter - tmotor->o_counter);
 			tmotor->velocity = temp_data/330.0/4.0*100.0*60.0; // rpm

@@ -1,5 +1,5 @@
 ../Core/Src/motor.c:14:6:MotorSetDir	16	static
 ../Core/Src/motor.c:30:6:MotorSetDuty	16	static
 ../Core/Src/motor.c:36:6:ReadEncoder	32	static
-../Core/Src/motor.c:59:6:MotorTuningVelocity	40	static
-../Core/Src/motor.c:80:6:MotorTuningPosition	40	static
+../Core/Src/motor.c:52:6:MotorTuningVelocity	40	static
+../Core/Src/motor.c:73:6:MotorTuningPosition	40	static
