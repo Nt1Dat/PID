@@ -37,12 +37,13 @@ void ReadEncoder(Motor_t * tmotor){
 			tmotor->counter=__HAL_TIM_GET_COUNTER(&htim4);
 
 			tmotor->rounds=tmotor->counter/330/4;
+
 			uint16_t temp_data = (tmotor->counter - tmotor->o_counter);
 			tmotor->velocity = temp_data/330.0/4.0*100.0*60.0; // rpm
 
 			tmotor->position+=tmotor->velocity/100/60*360; //deg
-			if(tmotor->position>=360){//
-						tmotor->position=0;
+			if(tmotor->position>=360){
+					tmotor->position=0;
 			}
 
 			tmotor->o_counter=tmotor->counter;
@@ -70,7 +71,8 @@ void MotorTuningVelocity(PID_CONTROL_t * PIDControl,Motor_t * tmotor,float vel)
     }
 
 }
-void MotorTuningPosition(PID_CONTROL_t * PIDControl,Motor_t * tmotor, float pos)
+
+void MotorTuningPosition(PID_CONTROL_t * PIDControl,Motor_t * tmotor,float pos)
 {
 
     float SetPoint = pos;
@@ -91,4 +93,3 @@ void MotorTuningPosition(PID_CONTROL_t * PIDControl,Motor_t * tmotor, float pos)
     }
 
 }
-

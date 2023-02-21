@@ -1,0 +1,6 @@
+../Core/Src/serial.c:26:10:subString	32	static
+../Core/Src/serial.c:39:6:StrCompare	32	static
+../Core/Src/serial.c:53:6:SerialInit	8	static
+../Core/Src/serial.c:59:6:SerialAcceptReceive	8	static
+../Core/Src/serial.c:89:6:SerialParse	16	static
+../Core/Src/serial.c:102:6:HAL_UART_RxCpltCallback	16	static

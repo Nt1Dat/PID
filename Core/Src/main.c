@@ -27,6 +27,7 @@
 #include "motor.h"
 #include "pid.h"
 #include "stdio.h"
+#include "serial.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,7 +60,17 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 Motor_t motor;
 PID_CONTROL_t pid;
-uint8_t buf[7];
+PROCESS_t process;
+uint8_t buf[8];
+
+
+extern uint8_t g_nRxBuff[MAX_LEN];
+extern uint8_t g_strCommand[4];
+extern uint8_t g_kp[4];
+extern uint8_t g_ki[4];
+extern uint8_t g_kd[4];
+extern uint8_t g_Setpoint[4];
+extern bool g_bDataAvailable;
 
 /* USER CODE END 0 */
 
@@ -96,15 +107,18 @@ int main(void)
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  //HAL_TIM_Encoder_Start_IT(htim, Channel)
+
+// cho vao motor init
   HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_2);
   HAL_TIM_Base_Start_IT(&htim3);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
 
+  SerialInit();
 
-  PIDInit(&pid, 0.5,0.25, 0.0001 );
+
+
 
 
   /* USER CODE END 2 */
@@ -113,11 +127,72 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  if(g_bDataAvailable == true)
+		  	      {
+		  	        if(StrCompare(g_strCommand, (uint8_t*)"SPID", 4))
+		  	        {
+		  	          process = SPID;
+		  	        }
+		  	        else if(StrCompare(g_strCommand, (uint8_t*)"VTUN", 4))
+		  	        {
+		  	          process = VTUN;
+		  	        }
+		  	        else if(StrCompare(g_strCommand, (uint8_t*)"PTUN", 4))
+		  	        {
+		  	          process = PTUN;
+		  	        }
+		  	      else if(StrCompare(g_strCommand, (uint8_t*)"STOP", 4))
+		  	       {
+		  	      	 process = STOP;
+		  	       }
+		  	        else
+		  	        {
+		  	          process = NONE;
+		  	        }
+		  	        g_bDataAvailable = false;
+		  	      }
+	  switch(process)
+	 	  	      {
+	 	  	        case NONE:
+	 	  	          SerialAcceptReceive();
+	 	  	          MotorSetDuty(0);
 
+	 	  	          break;
+	 	  	        case SPID:
+	 	  	        	PIDReset(&pid);
+
+	 	  	        	//get parameter
+	 	  	        	pid.dKp=(*(float*)g_kp);
+	 	  	        	pid.dKi=(*(float*)g_ki);
+	 	  	        	pid.dKd=(*(float*)g_kd);
+
+	 	  	        	motor.setPoint=(*(float*)g_Setpoint);
+	 	  	        	PIDReset(&pid);
+	 	  	        	process= NONE;
+	 	  	          break;
+	 	  	        case VTUN:
+
+
+	 	  	        	break;
+	 	  	        case PTUN:
+	 	  	        	break;
+	 	  	        case STOP:
+	 	  	        						  PIDReset(&pid);
+	 	  	        						  MotorSetDuty(0);
+	 	  	        		 	  	          motor.counter=0;
+	 	  	        		 	  	          motor.o_counter=0;
+	 	  	        		 	  	          motor.position=0;
+	 	  	        		 	  	          motor.position=0;
+	 	  	        		 	  	          motor.rounds=0;
+	 	  	        		 	  	          motor.velocity=0;
+	 	  	        		 	  	          motor.setPoint=0;
+	 	  	        		 	  	          htim4.Instance->CNT=0;
+	 	  	        	break;
+	 	  	         SerialAcceptReceive();
+	 	  	      }
 
   }
   /* USER CODE END 3 */
@@ -170,11 +245,33 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  if(htim->Instance == htim3.Instance)
 	  {
 
-		  ReadEncoder(&motor);
-		  MotorTuningVelocity(&pid, &motor, 80.);
-		  //sprintf(buf,"%d.%02u\n", (int) motor.velocity, (int) ((motor.velocity - (int) motor.velocity ) * 100) );
-		  //HAL_UART_Transmit(&huart1, buf, sizeof(buf),100);
+		  switch(process)
+		  	 	  	      {
+		  	 	  	        case NONE:
 
+		  	 	  	          break;
+
+
+		  	 	  	        case SPID:
+		  	 	  	          break;
+
+		  	 	  	        case VTUN:
+		  	 	  	       ReadEncoder(&motor);
+		  	 	  	       MotorTuningVelocity(&pid, &motor, motor.setPoint);
+		  	 	  	       sprintf(buf," %d.%02u ", (int) motor.velocity, (int) ((motor.velocity - (int) motor.velocity) * 100) );
+		  	 	  	       HAL_UART_Transmit(&huart1, buf, sizeof(buf),100);
+		  	 	  	        	break;
+
+		  	 	  	        case PTUN:
+		  	 	  	       ReadEncoder(&motor);
+		  	 	  	       sprintf(buf," %d.%02u ", (int) motor.position, (int) ((motor.position - (int) motor.position ) * 100) );
+		  	 	  	       HAL_UART_Transmit(&huart1, buf, sizeof(buf),100);
+		  	 	  	        	break;
+
+		  	 	  	        case STOP:
+		  	 	  	        	break;
+
+		  	 	  	      }
 
 
 	  }

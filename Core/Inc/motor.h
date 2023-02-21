@@ -7,11 +7,11 @@
 typedef struct
 {
 	uint16_t counter;
+	uint16_t o_counter;
 	uint16_t rounds;
 	float velocity;
-	uint16_t o_counter;
 	float position;
-	uint16_t o_position;
+    float setPoint;
 } Motor_t;
 
 extern void MotorSetDir(int8_t nDir);
