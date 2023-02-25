@@ -30,12 +30,12 @@ float PIDCompute(PID_CONTROL_t *PID_Ctrl, float SetPoint, float Input, float dTs
     float dP = 0, dI = 0, dD = 0;
     dP = PID_Ctrl -> dKp *Error;
     PID_Ctrl -> dIntergral += Error;
-    dI = PID_Ctrl->dKi * dTs/2 * PID_Ctrl->dIntergral;
+    dI = PID_Ctrl->dKi * dTs * PID_Ctrl->dIntergral;
     dD = PID_Ctrl->dKd * (Error - PID_Ctrl->dErrorTerm) /dTs;
-    PID_Ctrl->result = dP + dI + dD;
+    PID_Ctrl->result = 900*(dP + dI + dD);
 
-    if(PID_Ctrl->result>99){PID_Ctrl->result=99;}
-    if(PID_Ctrl->result<-99){PID_Ctrl->result=-99;}
+    if(PID_Ctrl->result>8000){PID_Ctrl->result=8000;}
+    if(PID_Ctrl->result<-8000){PID_Ctrl->result=-8000;}
 
     PID_Ctrl->dErrorTerm = Error;
 

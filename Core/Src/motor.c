@@ -38,15 +38,22 @@ void ReadEncoder(Motor_t * tmotor){
 
 			tmotor->rounds=tmotor->counter/330/4;
 
-			uint16_t temp_data = (tmotor->counter - tmotor->o_counter);
-			tmotor->velocity = temp_data/330.0/4.0*100.0*60.0; // rpm
 
-			tmotor->position+=tmotor->velocity/100/60*360; //deg
-			if(tmotor->position>=360){
-					tmotor->position=0;
-			}
+			int16_t temp_data = (tmotor->counter - tmotor->o_counter);
+
+
+			tmotor->vel = (float)temp_data/330.0/4.0*100.0*60.0; // rpm
+
+
+			tmotor->position+=tmotor->velocity/100./60*360; //deg
+
+			tmotor->velocity=0.7*tmotor->vel+0.2*tmotor->o_vel+0.1*tmotor->o_vel2;
 
 			tmotor->o_counter=tmotor->counter;
+			tmotor->o_vel=tmotor->vel;
+			tmotor->o_vel2=tmotor->o_vel;
+
+
 }
 
 //Turning
@@ -67,7 +74,7 @@ void MotorTuningVelocity(PID_CONTROL_t * PIDControl,Motor_t * tmotor,float vel)
     else if(g_nDutyCycle < 0.)
     {
         MotorSetDir(1);
-        MotorSetDuty(99-abs((int)g_nDutyCycle));
+        MotorSetDuty(8000-abs((int)g_nDutyCycle));
     }
 
 }
@@ -89,7 +96,7 @@ void MotorTuningPosition(PID_CONTROL_t * PIDControl,Motor_t * tmotor,float pos)
     else if(g_nDutyCycle < 0.)
     {
         MotorSetDir(1);
-        MotorSetDuty(99-abs((int)g_nDutyCycle));
+        MotorSetDuty(8000-abs((int)g_nDutyCycle));
     }
 
 }

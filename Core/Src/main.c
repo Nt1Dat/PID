@@ -64,6 +64,8 @@ PROCESS_t process;
 uint8_t buf[8];
 
 
+
+
 extern uint8_t g_nRxBuff[MAX_LEN];
 extern uint8_t g_strCommand[4];
 extern uint8_t g_kp[4];
@@ -121,6 +123,8 @@ int main(void)
 
 
 
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -159,6 +163,7 @@ int main(void)
 	 	  	        case NONE:
 	 	  	          SerialAcceptReceive();
 	 	  	          MotorSetDuty(0);
+	 	  	          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, 0);
 
 	 	  	          break;
 	 	  	        case SPID:
@@ -181,15 +186,22 @@ int main(void)
 	 	  	        	break;
 	 	  	        case STOP:
 	 	  	        						  PIDReset(&pid);
+	 	  	        						  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, 0);
 	 	  	        						  MotorSetDuty(0);
+	 	  	        						  //cho vào reset motor
 	 	  	        		 	  	          motor.counter=0;
 	 	  	        		 	  	          motor.o_counter=0;
 	 	  	        		 	  	          motor.position=0;
 	 	  	        		 	  	          motor.position=0;
 	 	  	        		 	  	          motor.rounds=0;
 	 	  	        		 	  	          motor.velocity=0;
+	 	  	        		 	  	          motor.vel=0;
+	 	  	        		 	  	          motor.o_vel=0;
 	 	  	        		 	  	          motor.setPoint=0;
 	 	  	        		 	  	          htim4.Instance->CNT=0;
+	 	  	        	break;
+	 	  	        case BUTT:
+	 	  	        	MotorSetDuty(1000);
 	 	  	        	break;
 	 	  	         SerialAcceptReceive();
 	 	  	      }
@@ -248,6 +260,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  switch(process)
 		  	 	  	      {
 		  	 	  	        case NONE:
+		  	 	  	       ReadEncoder(&motor);
 
 		  	 	  	          break;
 
@@ -258,17 +271,22 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  	 	  	        case VTUN:
 		  	 	  	       ReadEncoder(&motor);
 		  	 	  	       MotorTuningVelocity(&pid, &motor, motor.setPoint);
-		  	 	  	       sprintf(buf," %d.%02u ", (int) motor.velocity, (int) ((motor.velocity - (int) motor.velocity) * 100) );
-		  	 	  	       HAL_UART_Transmit(&huart1, buf, sizeof(buf),100);
+		  	 	  	       sprintf(buf,"  %d ", (int) motor.velocity );
+		  	 	  	       HAL_UART_Transmit(&huart1,buf, 8,1000);
+
 		  	 	  	        	break;
 
 		  	 	  	        case PTUN:
 		  	 	  	       ReadEncoder(&motor);
-		  	 	  	       sprintf(buf," %d.%02u ", (int) motor.position, (int) ((motor.position - (int) motor.position ) * 100) );
-		  	 	  	       HAL_UART_Transmit(&huart1, buf, sizeof(buf),100);
-		  	 	  	        	break;
+		  	 	  	       MotorTuningPosition(&pid, &motor, motor.setPoint);
+		  	 	  	       sprintf(buf,"  %d ", (int) motor.position );
+		  	 	  	       HAL_UART_Transmit(&huart1,buf, 8,1000);
+		  	 	  	       break;
 
 		  	 	  	        case STOP:
+		  	 	  	        	break;
+		  	 	  	        case BUTT:
+		  	 	  	        	ReadEncoder(&motor);
 		  	 	  	        	break;
 
 		  	 	  	      }
@@ -276,6 +294,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  }
 }
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin==GPIO_PIN_2)
+	{
+			process=BUTT;
+	}
+
+
+
+}
+
 
 
 /* USER CODE END 4 */

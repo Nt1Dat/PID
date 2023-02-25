@@ -9,6 +9,9 @@ typedef struct
 	uint16_t counter;
 	uint16_t o_counter;
 	uint16_t rounds;
+	float vel;
+	float o_vel;
+	float o_vel2;
 	float velocity;
 	float position;
     float setPoint;

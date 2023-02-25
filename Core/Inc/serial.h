@@ -15,6 +15,7 @@ typedef enum
     VTUN,
     PTUN,
 	STOP,
+	BUTT,
 }PROCESS_t;
 
 
