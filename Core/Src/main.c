@@ -28,6 +28,7 @@
 #include "pid.h"
 #include "stdio.h"
 #include "serial.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,6 +63,7 @@ Motor_t motor;
 PID_CONTROL_t pid;
 PROCESS_t process;
 uint8_t buf[8];
+uint8_t buff[];
 
 
 
@@ -189,15 +191,7 @@ int main(void)
 	 	  	        						  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, 0);
 	 	  	        						  MotorSetDuty(0);
 	 	  	        						  //cho vào reset motor
-	 	  	        		 	  	          motor.counter=0;
-	 	  	        		 	  	          motor.o_counter=0;
-	 	  	        		 	  	          motor.position=0;
-	 	  	        		 	  	          motor.position=0;
-	 	  	        		 	  	          motor.rounds=0;
-	 	  	        		 	  	          motor.velocity=0;
-	 	  	        		 	  	          motor.vel=0;
-	 	  	        		 	  	          motor.o_vel=0;
-	 	  	        		 	  	          motor.setPoint=0;
+	 	  	        						  MotorReset(&motor);
 	 	  	        		 	  	          htim4.Instance->CNT=0;
 	 	  	        	break;
 	 	  	        case BUTT:
@@ -269,18 +263,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  	 	  	          break;
 
 		  	 	  	        case VTUN:
+
 		  	 	  	       ReadEncoder(&motor);
 		  	 	  	       MotorTuningVelocity(&pid, &motor, motor.setPoint);
-		  	 	  	       sprintf(buf,"  %d ", (int) motor.velocity );
-		  	 	  	       HAL_UART_Transmit(&huart1,buf, 8,1000);
+		  	 	  	       sprintf(buff,"%d.", (int) motor.velocity );
+		  	 	  	       HAL_UART_Transmit(&huart1,buff,sizeof((char*)buff),1000);
 
 		  	 	  	        	break;
 
 		  	 	  	        case PTUN:
 		  	 	  	       ReadEncoder(&motor);
 		  	 	  	       MotorTuningPosition(&pid, &motor, motor.setPoint);
-		  	 	  	       sprintf(buf,"  %d ", (int) motor.position );
-		  	 	  	       HAL_UART_Transmit(&huart1,buf, 8,1000);
+		  	 	  	       sprintf(buf,"%d.", (int) motor.position );
+		  	 	  	       HAL_UART_Transmit(&huart1,buf,8,1000);
 		  	 	  	       break;
 
 		  	 	  	        case STOP:
@@ -293,7 +288,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 
 	  }
-}
+
+
+	  }
+
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin==GPIO_PIN_2)

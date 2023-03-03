@@ -17,6 +17,7 @@ typedef struct
     float setPoint;
 } Motor_t;
 
+extern void MotorReset(Motor_t *tmotor);
 extern void MotorSetDir(int8_t nDir);
 extern void MotorSetDuty(uint16_t nDuty);
 extern void ReadEncoder();

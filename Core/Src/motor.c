@@ -8,7 +8,10 @@
 #include "tim.h"
 #include "pid.h"
 
-
+void MotorReset(Motor_t *tmotor)
+{
+	memset(&tmotor,0,sizeof(tmotor));
+}
 
 //0 : CLW
 void MotorSetDir(int8_t nDir)
